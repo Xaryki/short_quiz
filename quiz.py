@@ -1,14 +1,18 @@
 import telebot
 from telebot import types
+import datetime
 
-bot = telebot.TeleBot('6785671733:AAGQrsi7L5NJQETnXZV5a33Gc4yZwUaPiyg')
+bot = telebot.TeleBot('6480180092:AAFmBo_J8keudQhxBvKJDMKCcOyKPHGUo_8')
 correct_answers = 0
+start_time = 0
 
 
 @bot.message_handler(commands=['start', 'test'])
 def start(message):
     global correct_answers
+    global start_time
     correct_answers = 0
+    start_time = 0
     keyboard = types.InlineKeyboardMarkup()
     key_yes = types.InlineKeyboardButton(text='Да', callback_data='first_question')
     key_no = types.InlineKeyboardButton(text='Нет', callback_data='stop')
@@ -19,7 +23,9 @@ def start(message):
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
     global correct_answers
+    global start_time
     if call.data == "first_question":
+        start_time = datetime.datetime.now()
         keyboard = types.InlineKeyboardMarkup()
         key_1 = types.InlineKeyboardButton(text='5', callback_data='second_question')
         key_2 = types.InlineKeyboardButton(text='6', callback_data='second_question')
@@ -90,12 +96,21 @@ def callback_worker(call):
                               text="В каком языке полностью автоматический сборщик мусора (garbage collector)?",
                               reply_markup=keyboard)
     elif call.data == "fifth_question":
+        final_time = datetime.datetime.now() - start_time
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                               text=f"Ура! Вы прошли тест!\nВаш результат: {correct_answers}/4")
+        with open("score.txt", "a") as file:
+            score_list = f"Результат: {correct_answers}/4, id: {call.from_user.id}, Имя: {call.from_user.first_name}, Время: {final_time}\n"
+            file.write(score_list)
+
     elif call.data == "fifth_question_t":
         correct_answers += 1
+        final_time = datetime.datetime.now() - start_time
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                               text=f"Ура! Вы прошли тест!\nВаш результат: {correct_answers}/4")
+        with open("score.txt", "a") as file:
+            score_list = f"Результат: {correct_answers}/4, id: {call.from_user.id}, Имя: {call.from_user.first_name}, Время: {final_time}\n"
+            file.write(score_list)
 
 
 bot.polling(none_stop=True, interval=0)
