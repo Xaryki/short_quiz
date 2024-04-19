@@ -12,7 +12,11 @@ questions = [
     {"question": "Какой язык программирования считается самым безопасным?", "options": ["C++", "C", "Rust", "Ruby"],
      "correct_option": 2},
     {"question": "В каком языке полностью автоматический сборщик мусора (garbage collector)?",
-     "options": ["Python", "C#", "C++", "R"], "correct_option": 0}
+     "options": ["Python", "C#", "C++", "R"], "correct_option": 0},
+    {"question": "Сколько будет 2 + 2 ?", "options": ["4", "3", "1", "2"],
+         "correct_option": 0},
+    {"question": "Сколько будет 5 + 5 ?", "options": ["4", "10", "1", "2"],
+     "correct_option": 1}
 ]
 
 correct_answers = 0
@@ -57,7 +61,7 @@ def callback_worker(call):
         final_time = datetime.datetime.now() - start_time
         bot.send_message(call.message.chat.id,
                          f"Ура! Вы прошли тест!\nВаш результат: {correct_answers}/{len(questions)}")
-        with open("score.txt", "a") as file:
+        with open("score.txt", "a", encoding="utf-8") as file:
             score_list = f"Результат: {correct_answers}/{len(questions)}, id: {call.from_user.id}, Имя: {call.from_user.first_name}, Время: {final_time}\n"
             file.write(score_list)
 
